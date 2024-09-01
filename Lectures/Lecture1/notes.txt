@@ -1,0 +1,44 @@
+Lecture Link: https://cs50.harvard.edu/python/2022/notes/1/
+
+
+Comparisons
+===============
+>       greater than
+>=      greather than or equal to
+<       less than
+<=      less than or equal to
+==      eqaulity (comparing left and right
+=       assignment (right to left)
+!=      not equal to
+
+
+
+Comparison: if
+
+if the answer is true:
+    then execute code for me...
+
+if <>:
+    xx
+elif:
+    yy
+else:
+    zz
+
+Program is not designed well even through its correct
+- Too many repetitive (if this, if this, if this,...)
+- Always asking X (num_ifs) questions
+- How to ask less ifs iterativly is "elif"
+- Dont need the last "elif", just need "else"
+
+
+# if x % 2 == 0:
+#     print("Number is even")
+# else:
+#     print("Number is odd")
+    
+main():
+
+
+Question if you define your own function? canyou use  ".split()" or ".title()"
+only if its a stirng! Depends on your object type (str, int, bool, etc.)
