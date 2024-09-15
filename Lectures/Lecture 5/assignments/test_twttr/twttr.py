@@ -7,13 +7,16 @@ uppercase or lowercase.
 
 def main():
     user_input = input("Input: ")
-    print("Output: ", end="")
-    
-    for letter in user_input:
-        if letter.lower() in ["a", "e", "i", "o", "u"]:
-            print("", end="")
-        else:
-            print(letter, end="")
+    print(f"Output: {shorten(user_input)}")
+
+
+def shorten(word):
+    new_word = ""
+    for letter in word:
+        if not letter.lower() in ["a", "e", "i", "o", "u"]:
+            new_word += letter
+    return new_word
+
 
 if __name__ == "__main__":
     main()
