@@ -1,10 +1,19 @@
-prompt = input("Greeting: ").lower()
+
+def main(): 
+    prompt = input("Greeting: ")
+    print(f"${value(prompt)}")
 
 
-match prompt:
-    case s if s.startswith("hello"):
-        print("$0")
-    case s if s.startswith("h"):
-        print("$20")
-    case _:
-        print("$100")
+def value(greeting):
+    greeting = greeting.lower()
+    
+    match greeting:
+        case s if s.startswith("hello"):
+            return 0
+        case s if s.startswith("h"):
+            return 20
+        case _:
+            return 100
+        
+if __name__ == "__main__":
+    main()

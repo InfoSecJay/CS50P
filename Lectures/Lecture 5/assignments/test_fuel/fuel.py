@@ -11,31 +11,27 @@ like ValueError or ZeroDivisionError.
 """
 
 def main():
-    get_fractions()
-
-
-def get_fractions():
+    fraction = input("Fraction: ")
+    percentage = convert(fraction)
+    print(gauge(percentage))
     
-    while True:
-        try:
-            user_input = input("Fraction: ")
-            (x,y) = user_input.split("/")
-            percentage = (int(x) / int(y))*100
 
-            if x < y:
-                if percentage <= 1:
-                   print("E")
-                elif percentage >=99:
-                    print("F")
-                else:
-                    print(round(percentage), "%", sep="")
-                exit()
-            else:
-                return get_fractions()
+def convert(fraction):
+    try:
+        (x,y) = fraction.split("/")
+        percentage = (int(x) / int(y))*100
+        return round(percentage)
+    except (ValueError, ZeroDivisionError):
+        raise
 
-        except (ValueError, ZeroDivisionError):
-            continue
-        
+def gauge(percentage):
+    if percentage <= 1:
+        return "E"
+    elif percentage >=99:
+        return "F"
+    else:
+        return f"{percentage}%" 
+
 
 if __name__ == "__main__":
     main()

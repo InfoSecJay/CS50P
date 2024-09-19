@@ -9,14 +9,14 @@ You’re welcome to implement additional functions for is_valid to call (e.g., o
 def main():
     plate = input("Plate: ")
     
-    if is_valid(plate):
+    if is_valid(plate) == True:
         print("Valid")
     else:
         print("Invalid")
     
 def is_valid(plate):
-   
-    if plate.isalnum() and plate[0:1].isalpha() and 2 <= len(plate) <= 6:
+
+    if plate.isalnum() and plate[0:2].isalpha() and 2 <= len(plate) <= 6: # if alphanumric, first 2 ltters are alpha, and between 2 and 6 length
         for item in plate:
             if item.isdigit():
                 index = plate.index(item)
@@ -25,6 +25,8 @@ def is_valid(plate):
                 else:
                     return False
         return True    
+    else:
+        return False
 
 if __name__ == "__main__":
     main()
