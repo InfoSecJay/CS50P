@@ -16,8 +16,8 @@ def process_image(input_image, output_image):
     img = Image.open(input_image)
     shirt = Image.open("shirt.png")
     print("success")
-    # size = shirt.size
-    # photo.paste(shirt, shirt)
+    size = shirt.size
+    # img.paste(shirt, shirt)
     print(img.size)
     print(shirt.size)
     
