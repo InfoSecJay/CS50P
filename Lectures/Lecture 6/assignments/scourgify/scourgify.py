@@ -9,23 +9,23 @@ def main():
 
 
 def process_csv(input_csv, output_csv):
-    
-    with open(input_csv, 'r', newline='') as in_file:
-        reader = csv.DictReader(in_file)
-        
-        with open(output_csv, 'w', newline='') as out_file:
-            writer = csv.DictWriter(out_file, fieldnames = reader.fieldnames)
-            writer.writeheader()
+    try:
+        with open(input_csv, 'r', newline='') as in_file:
+            reader = csv.DictReader(in_file)
+            new_list = []
+            
             for row in reader:
-                last, first = row['name'].split(', ')
-                writer.writerow(row)
-
-
-
-
-
-
-
+                last,first = row['name'].split(", ")
+                house = row['house']
+                new_list.append({"first": first, "last": last, "house": house})
+                
+            with open(output_csv, 'w', newline='') as out_file:
+                writer = csv.DictWriter(out_file, fieldnames = ["first", "last", "house"])
+                writer.writeheader()
+                for row in new_list:
+                    writer.writerow(row)
+    except FileNotFoundError:
+        sys.exit("Could not find file")
 
 
 def check_args():
