@@ -13,7 +13,6 @@ def process_csv(input_csv, output_csv):
         with open(input_csv, 'r', newline='') as in_file:
             reader = csv.DictReader(in_file)
             new_list = []
-            
             for row in reader:
                 last,first = row['name'].split(", ")
                 house = row['house']

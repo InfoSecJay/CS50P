@@ -1,0 +1,369 @@
+GitHub Folder Location,GitHub File Name,metadata.creation_date,metadata.integration,metadata.maturity,metadata.updated_date,rule.author,rule.description,rule.false_positives,rule.from,rule.index,rule.language,rule.license,rule.name,rule.references,rule.risk_score,rule.rule_id,rule.severity,rule.tags,rule.timeline_id,rule.timeline_title,rule.timestamp_override,rule.type,rule.query,rule.threat
+rules/network,command_and_control_accepted_default_telnet_port_connection.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of Telnet traffic. Telnet is commonly used by system
+administrators to remotely control older or embedded systems using the command line shell. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector. As a plain-text protocol, it may also expose usernames and passwords to anyone capable of observing the
+traffic.
+",['    IoT (Internet of Things) devices and networks may use telnet and can be excluded if desired. Some business\n    work-flows may use Telnet for administration of older devices. These often have a predictable behavior. Telnet\n    activity involving an unusual source or destination may be more suspicious. Telnet activity involving a production\n    server that has no known associated Telnet work-flow or business requirement is often suspicious.\n    '],now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,Accepted Default Telnet Port Connection,,47,34fde489-94b0-4500-a76f-b8a157cf9269,medium,"['Domain: Endpoint', 'Use Case: Threat Detection', 'Tactic: Command and Control', 'Tactic: Lateral Movement', 'Tactic: Initial Access', 'Data Source: PAN-OS']",300afc76-072d-4261-864d-4149714bf3f1,Comprehensive Network Timeline,event.ingested,query,"(event.dataset:network_traffic.flow or event.category:(network or network_traffic))
+    and event.type:connection and not event.action:(
+        flow_dropped or flow_denied or denied or deny or
+        flow_terminated or timeout or Reject or network_flow)
+    and destination.port:23
+","[{'framework': 'MITRE ATT&CK', 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1021', 'name': 'Remote Services', 'reference': 'https://attack.mitre.org/techniques/T1021/'}], 'tactic': {'id': 'TA0008', 'name': 'Lateral Movement', 'reference': 'https://attack.mitre.org/tactics/TA0008/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,command_and_control_cobalt_strike_beacon.toml,2020/07/06,['network_traffic'],production,2024/05/21,['Elastic'],"Cobalt Strike is a threat emulation platform commonly modified and used by adversaries to conduct network attack and
+exploitation campaigns. This rule detects a network activity algorithm leveraged by Cobalt Strike implant beacons for
+command and control.
+","['    This rule should be tailored to either exclude systems, as sources or destinations, in which this behavior is\n    expected.\n    ']",now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*']",lucene,Elastic License v2,Cobalt Strike Command and Control Beacon,"['https://blog.morphisec.com/fin7-attacks-restaurant-industry', 'https://www.fireeye.com/blog/threat-research/2017/04/fin7-phishing-lnk.html', 'https://www.elastic.co/security-labs/collecting-cobalt-strike-beacons-with-the-elastic-stack']",73,cf53f532-9cc9-445a-9ae7-fced307ec53c,high,"['Use Case: Threat Detection', 'Tactic: Command and Control', 'Domain: Endpoint']",,,event.ingested,query,"((event.category: (network OR network_traffic) AND type: (tls OR http))
+    OR event.dataset: (network_traffic.tls OR network_traffic.http)
+) AND destination.domain:/[a-z]{3}.stage.[0-9]{8}\..*/
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1071', 'name': 'Application Layer Protocol', 'reference': 'https://attack.mitre.org/techniques/T1071/'}, {'id': 'T1568', 'name': 'Dynamic Resolution', 'reference': 'https://attack.mitre.org/techniques/T1568/', 'subtechnique': [{'id': 'T1568.002', 'name': 'Domain Generation Algorithms', 'reference': 'https://attack.mitre.org/techniques/T1568/002/'}]}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_cobalt_strike_default_teamserver_cert.toml,2020/10/05,['network_traffic'],production,2024/05/21,['Elastic'],"This rule detects the use of the default Cobalt Strike Team Server TLS certificate. Cobalt Strike is software for
+Adversary Simulations and Red Team Operations which are security assessments that replicate the tactics and techniques
+of an advanced adversary in a network. Modifications to the Packetbeat configuration can be made to include MD5 and
+SHA256 hashing algorithms (the default is SHA1). See the References section for additional information on module
+configuration.
+",,now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*']",kuery,Elastic License v2,Default Cobalt Strike Team Server Certificate,"['https://attack.mitre.org/software/S0154/', 'https://www.cobaltstrike.com/help-setup-collaboration', 'https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-tls.html', 'https://www.elastic.co/guide/en/beats/filebeat/7.9/filebeat-module-suricata.html', 'https://www.elastic.co/guide/en/beats/filebeat/7.9/filebeat-module-zeek.html', 'https://www.elastic.co/security-labs/collecting-cobalt-strike-beacons-with-the-elastic-stack']",99,e7075e8d-a966-458e-a183-85cd331af255,critical,"['Tactic: Command and Control', 'Threat: Cobalt Strike', 'Use Case: Threat Detection', 'Domain: Endpoint']",,,event.ingested,query,"(event.dataset: network_traffic.tls or event.category: (network or network_traffic))
+  and (tls.server.hash.md5:950098276A495286EB2A2556FBAB6D83
+  or tls.server.hash.sha1:6ECE5ECE4192683D2D84E25B0BA7E04F9CB7EB7C
+  or tls.server.hash.sha256:87F2085C32B6A2CC709B365F55873E207A9CAA10BFFECF2FD16D3CF9D94D390C)
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1071', 'name': 'Application Layer Protocol', 'reference': 'https://attack.mitre.org/techniques/T1071/', 'subtechnique': [{'id': 'T1071.001', 'name': 'Web Protocols', 'reference': 'https://attack.mitre.org/techniques/T1071/001/'}]}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_download_rar_powershell_from_internet.toml,2020/07/02,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"Detects a Roshal Archive (RAR) file or PowerShell script downloaded from the internet by an internal host. Gaining
+initial access to a system and then downloading encoded or encrypted tools to move laterally is a common practice for
+adversaries as a way to protect their more valuable tools and tactics, techniques, and procedures (TTPs). This may be
+atypical behavior for a managed network and can be indicative of malware, exfiltration, or command and control.
+",['    Downloading RAR or PowerShell files from the Internet may be expected for certain systems. This rule should be\n    tailored to either exclude systems as sources or destinations in which this behavior is expected.\n    '],now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,Roshal Archive (RAR) or PowerShell File Downloaded from the Internet,"['https://www.fireeye.com/blog/threat-research/2017/04/fin7-phishing-lnk.html', 'https://www.justice.gov/opa/press-release/file/1084361/download', 'https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml']",47,ff013cb4-274d-434a-96bb-fe15ddd3ae92,medium,"['Use Case: Threat Detection', 'Tactic: Command and Control', 'Domain: Endpoint', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: (network_traffic.http or network_traffic.tls) or
+  (event.category: (network or network_traffic) and network.protocol: http)) and
+  (url.extension:(ps1 or rar) or url.path:(*.ps1 or *.rar)) and
+    not destination.ip:(
+      10.0.0.0/8 or
+      127.0.0.0/8 or
+      169.254.0.0/16 or
+      172.16.0.0/12 or
+      192.0.0.0/24 or
+      192.0.0.0/29 or
+      192.0.0.8/32 or
+      192.0.0.9/32 or
+      192.0.0.10/32 or
+      192.0.0.170/32 or
+      192.0.0.171/32 or
+      192.0.2.0/24 or
+      192.31.196.0/24 or
+      192.52.193.0/24 or
+      192.168.0.0/16 or
+      192.88.99.0/24 or
+      224.0.0.0/4 or
+      100.64.0.0/10 or
+      192.175.48.0/24 or
+      198.18.0.0/15 or
+      198.51.100.0/24 or
+      203.0.113.0/24 or
+      240.0.0.0/4 or
+      ""::1"" or
+      ""FE80::/10"" or
+      ""FF00::/8""
+    ) and
+    source.ip:(
+      10.0.0.0/8 or
+      172.16.0.0/12 or
+      192.168.0.0/16
+    )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1105', 'name': 'Ingress Tool Transfer', 'reference': 'https://attack.mitre.org/techniques/T1105/'}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_fin7_c2_behavior.toml,2020/07/06,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects a known command and control pattern in network events. The FIN7 threat group is known to use this
+command and control technique, while maintaining persistence in their target's network.
+","[""    This rule could identify benign domains that are formatted similarly to FIN7's command and control algorithm. Alerts\n    should be investigated by an analyst to assess the validity of the individual observations.\n    ""]",now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",lucene,Elastic License v2,Possible FIN7 DGA Command and Control Behavior,['https://www.fireeye.com/blog/threat-research/2018/08/fin7-pursuing-an-enigmatic-and-evasive-global-criminal-operation.html'],73,4a4e23cf-78a2-449c-bac3-701924c269d3,high,"['Use Case: Threat Detection', 'Tactic: Command and Control', 'Domain: Endpoint', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: (network_traffic.tls OR network_traffic.http) OR
+    (event.category: (network OR network_traffic) AND type: (tls OR http) AND network.transport: tcp)) AND
+destination.domain:/[a-zA-Z]{4,5}\.(pw|us|club|info|site|top)/ AND NOT destination.domain:zoom.us
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1071', 'name': 'Application Layer Protocol', 'reference': 'https://attack.mitre.org/techniques/T1071/'}, {'id': 'T1568', 'name': 'Dynamic Resolution', 'reference': 'https://attack.mitre.org/techniques/T1568/', 'subtechnique': [{'id': 'T1568.002', 'name': 'Domain Generation Algorithms', 'reference': 'https://attack.mitre.org/techniques/T1568/002/'}]}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_halfbaked_beacon.toml,2020/07/06,['network_traffic'],production,2024/05/21,['Elastic'],"Halfbaked is a malware family used to establish persistence in a contested network. This rule detects a network activity
+algorithm leveraged by Halfbaked implant beacons for command and control.
+","['    This rule should be tailored to exclude systems, either as sources or destinations, in which this behavior is\n    expected.\n    ']",now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*']",lucene,Elastic License v2,Halfbaked Command and Control Beacon,"['https://www.fireeye.com/blog/threat-research/2017/04/fin7-phishing-lnk.html', 'https://attack.mitre.org/software/S0151/']",73,2e580225-2a58-48ef-938b-572933be06fe,high,"['Use Case: Threat Detection', 'Tactic: Command and Control', 'Domain: Endpoint']",,,event.ingested,query,"(event.dataset: (network_traffic.tls OR network_traffic.http) OR
+  (event.category: (network OR network_traffic) AND network.protocol: http)) AND
+  network.transport:tcp AND url.full:/http:\/\/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}\/cd/ AND
+  destination.port:(53 OR 80 OR 8080 OR 443)
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1071', 'name': 'Application Layer Protocol', 'reference': 'https://attack.mitre.org/techniques/T1071/'}, {'id': 'T1568', 'name': 'Dynamic Resolution', 'reference': 'https://attack.mitre.org/techniques/T1568/', 'subtechnique': [{'id': 'T1568.002', 'name': 'Domain Generation Algorithms', 'reference': 'https://attack.mitre.org/techniques/T1568/002/'}]}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_nat_traversal_port_activity.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects events that could be describing IPSEC NAT Traversal traffic. IPSEC is a VPN technology that allows one
+system to talk to another using encrypted tunnels. NAT Traversal enables these tunnels to communicate over the Internet
+where one of the sides is behind a NAT router gateway. This may be common on your network, but this technique is also
+used by threat actors to avoid detection.
+","['    Some networks may utilize these protocols but usage that is unfamiliar to local network administrators can be\n    unexpected and suspicious. Because this port is in the ephemeral range, this rule may false under certain\n    conditions, such as when an application server with a public IP address replies to a client which has used a UDP\n    port in the range by coincidence. This is uncommon but such servers can be excluded.\n    ']",now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.*']",kuery,Elastic License v2,IPSEC NAT Traversal Port Activity,,21,a9cb3641-ff4b-4cdc-a063-b4b8d02a67c7,low,"['Tactic: Command and Control', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and network.transport:udp and destination.port:4500
+","[{'framework': 'MITRE ATT&CK', 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,command_and_control_port_26_activity.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects events that may indicate use of SMTP on TCP port 26. This port is commonly used by several popular
+mail transfer agents to deconflict with the default SMTP port 25. This port has also been used by a malware family
+called BadPatch for command and control of Windows systems.
+",['    Servers that process email traffic may cause false positives and should be excluded from this rule as this is\n    expected behavior.\n    '],now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,SMTP on Port 26/TCP,"['https://unit42.paloaltonetworks.com/unit42-badpatch/', 'https://isc.sans.edu/forums/diary/Next+up+whats+up+with+TCP+port+26/25564/']",21,d7e62693-aab9-4f66-a21a-3d79ecdd603d,low,"['Tactic: Command and Control', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: (network_traffic.flow or zeek.smtp) or event.category:(network or network_traffic)) and network.transport:tcp and destination.port:26
+","[{'framework': 'MITRE ATT&CK', 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1048', 'name': 'Exfiltration Over Alternative Protocol', 'reference': 'https://attack.mitre.org/techniques/T1048/'}], 'tactic': {'id': 'TA0010', 'name': 'Exfiltration', 'reference': 'https://attack.mitre.org/tactics/TA0010/'}}]"
+rules/network,command_and_control_rdp_remote_desktop_protocol_from_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of RDP traffic from the Internet. RDP is commonly used by
+system administrators to remotely control a system for maintenance or to use shared resources. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector.
+","['    Some network security policies allow RDP directly from the Internet but usage that is unfamiliar to server or\n    network owners can be unexpected and suspicious. RDP services may be exposed directly to the Internet in some\n    networks such as cloud environments. In such cases, only RDP gateways, bastions or jump servers may be expected\n    expose RDP directly to the Internet and can be exempted from this rule. RDP may be required by some work-flows such\n    as remote access and support for specialized software products and servers. Such work-flows are usually known and\n    not unexpected.\n    ']",now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,RDP (Remote Desktop Protocol) from the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],47,8c1bdde8-4204-45c0-9e0c-c85ca3902488,medium,"['Tactic: Command and Control', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",300afc76-072d-4261-864d-4149714bf3f1,Comprehensive Network Timeline,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and
+  network.transport:tcp and (destination.port:3389 or event.dataset:zeek.rdp) and
+  not source.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  ) and
+  destination.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  )
+","[{'framework': 'MITRE ATT&CK', 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1021', 'name': 'Remote Services', 'reference': 'https://attack.mitre.org/techniques/T1021/'}], 'tactic': {'id': 'TA0008', 'name': 'Lateral Movement', 'reference': 'https://attack.mitre.org/tactics/TA0008/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,command_and_control_vnc_virtual_network_computing_from_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of VNC traffic from the Internet. VNC is commonly used by
+system administrators to remotely control a system for maintenance or to use shared resources. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector.
+",['    VNC connections may be received directly to Linux cloud server instances but such connections are usually made only\n    by engineers. VNC is less common than SSH or RDP but may be required by some work-flows such as remote access and\n    support for specialized software products or servers. Such work-flows are usually known and not unexpected. Usage\n    that is unfamiliar to server or network owners can be unexpected and suspicious.\n    '],now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,VNC (Virtual Network Computing) from the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],73,5700cb81-df44-46aa-a5d7-337798f53eb8,high,"['Tactic: Command and Control', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and
+  network.transport:tcp and destination.port >= 5800 and destination.port <= 5810 and
+  not source.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  ) and
+  destination.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1219', 'name': 'Remote Access Software', 'reference': 'https://attack.mitre.org/techniques/T1219/'}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,command_and_control_vnc_virtual_network_computing_to_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of VNC traffic to the Internet. VNC is commonly used by
+system administrators to remotely control a system for maintenance or to use shared resources. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector.
+",['    VNC connections may be made directly to Linux cloud server instances but such connections are usually made only by\n    engineers. VNC is less common than SSH or RDP but may be required by some work flows such as remote access and\n    support for specialized software products or servers. Such work-flows are usually known and not unexpected. Usage\n    that is unfamiliar to server or network owners can be unexpected and suspicious.\n    '],now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,VNC (Virtual Network Computing) to the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],47,3ad49c61-7adc-42c1-b788-732eda2f5abf,medium,"['Tactic: Command and Control', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow  or (event.category: (network or network_traffic))) and
+  network.transport:tcp and destination.port >= 5800 and destination.port <= 5810 and
+  source.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  ) and
+  not destination.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1219', 'name': 'Remote Access Software', 'reference': 'https://attack.mitre.org/techniques/T1219/'}], 'tactic': {'id': 'TA0011', 'name': 'Command and Control', 'reference': 'https://attack.mitre.org/tactics/TA0011/'}}]"
+rules/network,discovery_potential_network_sweep_detected.toml,2023/05/17,"['endpoint', 'network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule identifies a potential network sweep. A network sweep is a method used by attackers to scan a target network,
+identifying active hosts, open ports, and available services to gather information on vulnerabilities and weaknesses.
+This reconnaissance helps them plan subsequent attacks and exploit potential entry points for unauthorized access, data
+theft, or other malicious activities. This rule proposes threshold logic to check for connection attempts from one
+source host to 10 or more destination hosts on commonly used network services.
+",,now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-endpoint.events.network-*', 'logs-panw.panos*']",kuery,Elastic License v2,Potential Network Sweep Detected,,21,781f8746-2180-4691-890c-4c96d11ca91d,low,"['Domain: Network', 'Tactic: Discovery', 'Tactic: Reconnaissance', 'Use Case: Network Security Monitoring', 'Data Source: Elastic Defend', 'Data Source: PAN-OS']",,,event.ingested,threshold,"destination.port : (21 or 22 or 23 or 25 or 139 or 445 or 3389 or 5985 or 5986) and
+source.ip : (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16)
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1046', 'name': 'Network Service Discovery', 'reference': 'https://attack.mitre.org/techniques/T1046/'}], 'tactic': {'id': 'TA0007', 'name': 'Discovery', 'reference': 'https://attack.mitre.org/tactics/TA0007/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1595', 'name': 'Active Scanning', 'reference': 'https://attack.mitre.org/techniques/T1595/', 'subtechnique': [{'id': 'T1595.001', 'name': 'Scanning IP Blocks', 'reference': 'https://attack.mitre.org/techniques/T1595/001/'}]}], 'tactic': {'id': 'TA0043', 'name': 'Reconnaissance', 'reference': 'https://attack.mitre.org/tactics/TA0043/'}}]"
+rules/network,discovery_potential_port_scan_detected.toml,2023/05/17,"['endpoint', 'network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule identifies a potential port scan. A port scan is a method utilized by attackers to systematically scan a
+target system or network for open ports, allowing them to identify available services and potential vulnerabilities. By
+mapping out the open ports, attackers can gather critical information to plan and execute targeted attacks, gaining
+unauthorized access, compromising security, and potentially leading to data breaches, unauthorized control, or further
+exploitation of the targeted system or network. This rule proposes threshold logic to check for connection attempts from
+one source host to 20 or more destination ports.
+",,now-9m,"['logs-endpoint.events.network-*', 'logs-network_traffic.*', 'packetbeat-*', 'filebeat-*', 'auditbeat-*', 'logs-panw.panos*']",kuery,Elastic License v2,Potential Network Scan Detected,,21,0171f283-ade7-4f87-9521-ac346c68cc9b,low,"['Domain: Network', 'Tactic: Discovery', 'Tactic: Reconnaissance', 'Use Case: Network Security Monitoring', 'Data Source: Elastic Defend', 'Data Source: PAN-OS']",,,event.ingested,threshold,"destination.port : * and event.action : ""network_flow"" and source.ip : (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16)
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1046', 'name': 'Network Service Discovery', 'reference': 'https://attack.mitre.org/techniques/T1046/'}], 'tactic': {'id': 'TA0007', 'name': 'Discovery', 'reference': 'https://attack.mitre.org/tactics/TA0007/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1595', 'name': 'Active Scanning', 'reference': 'https://attack.mitre.org/techniques/T1595/', 'subtechnique': [{'id': 'T1595.001', 'name': 'Scanning IP Blocks', 'reference': 'https://attack.mitre.org/techniques/T1595/001/'}]}], 'tactic': {'id': 'TA0043', 'name': 'Reconnaissance', 'reference': 'https://attack.mitre.org/tactics/TA0043/'}}]"
+rules/network,discovery_potential_syn_port_scan_detected.toml,2023/05/17,"['endpoint', 'network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule identifies a potential SYN-Based port scan. A SYN port scan is a technique employed by attackers to scan a
+target network for open ports by sending SYN packets to multiple ports and observing the response. Attackers use this
+method to identify potential entry points or services that may be vulnerable to exploitation, allowing them to launch
+targeted attacks or gain unauthorized access to the system or network, compromising its security and potentially leading
+to data breaches or further malicious activities. This rule proposes threshold logic to check for connection attempts
+from one source host to 10 or more destination ports using 2 or less packets per port.
+",,now-9m,"['logs-endpoint.events.network-*', 'logs-network_traffic.*', 'packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-panw.panos*']",kuery,Elastic License v2,Potential SYN-Based Network Scan Detected,,21,bbaa96b9-f36c-4898-ace2-581acb00a409,low,"['Domain: Network', 'Tactic: Discovery', 'Tactic: Reconnaissance', 'Use Case: Network Security Monitoring', 'Data Source: Elastic Defend', 'Data Source: PAN-OS']",,,event.ingested,threshold,"destination.port : * and network.packets <= 2 and source.ip : (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16)
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1046', 'name': 'Network Service Discovery', 'reference': 'https://attack.mitre.org/techniques/T1046/'}], 'tactic': {'id': 'TA0007', 'name': 'Discovery', 'reference': 'https://attack.mitre.org/tactics/TA0007/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1595', 'name': 'Active Scanning', 'reference': 'https://attack.mitre.org/techniques/T1595/', 'subtechnique': [{'id': 'T1595.001', 'name': 'Scanning IP Blocks', 'reference': 'https://attack.mitre.org/techniques/T1595/001/'}]}], 'tactic': {'id': 'TA0043', 'name': 'Reconnaissance', 'reference': 'https://attack.mitre.org/tactics/TA0043/'}}]"
+rules/network,initial_access_rpc_remote_procedure_call_from_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of RPC traffic from the Internet. RPC is commonly used by
+system administrators to remotely control a system for maintenance or to use shared resources. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector.
+",,now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,RPC (Remote Procedure Call) from the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],73,143cb236-0956-4f42-a706-814bcaa0cf5a,high,"['Tactic: Initial Access', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and
+  network.transport:tcp and (destination.port:135 or event.dataset:zeek.dce_rpc) and
+  not source.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  ) and
+  destination.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,initial_access_rpc_remote_procedure_call_to_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of RPC traffic to the Internet. RPC is commonly used by
+system administrators to remotely control a system for maintenance or to use shared resources. It should almost never be
+directly exposed to the Internet, as it is frequently targeted and exploited by threat actors as an initial access or
+backdoor vector.
+",,now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,RPC (Remote Procedure Call) to the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],73,32923416-763a-4531-bb35-f33b9232ecdb,high,"['Tactic: Initial Access', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and
+  network.transport:tcp and (destination.port:135 or event.dataset:zeek.dce_rpc) and
+  source.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  ) and
+  not destination.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,initial_access_smb_windows_file_sharing_activity_to_the_internet.toml,2020/02/18,"['network_traffic', 'panw']",production,2024/09/18,['Elastic'],"This rule detects network events that may indicate the use of Windows file sharing (also called SMB or CIFS) traffic to
+the Internet. SMB is commonly used within networks to share files, printers, and other system resources amongst trusted
+systems. It should almost never be directly exposed to the Internet, as it is frequently targeted and exploited by
+threat actors as an initial access or backdoor vector or for data exfiltration.
+",,now-9m,"['packetbeat-*', 'auditbeat-*', 'filebeat-*', 'logs-network_traffic.*', 'logs-panw.panos*']",kuery,Elastic License v2,SMB (Windows File Sharing) Activity to the Internet,['https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml'],73,c82b2bd8-d701-420c-ba43-f11a155b681a,high,"['Tactic: Initial Access', 'Domain: Endpoint', 'Use Case: Threat Detection', 'Data Source: PAN-OS']",,,event.ingested,query,"(event.dataset: network_traffic.flow or (event.category: (network or network_traffic))) and
+  network.transport:tcp and (destination.port:(139 or 445) or event.dataset:zeek.smb) and
+  source.ip:(
+    10.0.0.0/8 or
+    172.16.0.0/12 or
+    192.168.0.0/16
+  ) and
+  not destination.ip:(
+    10.0.0.0/8 or
+    127.0.0.0/8 or
+    169.254.0.0/16 or
+    172.16.0.0/12 or
+    192.0.0.0/24 or
+    192.0.0.0/29 or
+    192.0.0.8/32 or
+    192.0.0.9/32 or
+    192.0.0.10/32 or
+    192.0.0.170/32 or
+    192.0.0.171/32 or
+    192.0.2.0/24 or
+    192.31.196.0/24 or
+    192.52.193.0/24 or
+    192.168.0.0/16 or
+    192.88.99.0/24 or
+    224.0.0.0/4 or
+    100.64.0.0/10 or
+    192.175.48.0/24 or
+    198.18.0.0/15 or
+    198.51.100.0/24 or
+    203.0.113.0/24 or
+    240.0.0.0/4 or
+    ""::1"" or
+    ""FE80::/10"" or
+    ""FF00::/8""
+  )
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}, {'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1048', 'name': 'Exfiltration Over Alternative Protocol', 'reference': 'https://attack.mitre.org/techniques/T1048/'}], 'tactic': {'id': 'TA0010', 'name': 'Exfiltration', 'reference': 'https://attack.mitre.org/tactics/TA0010/'}}]"
+rules/network,initial_access_unsecure_elasticsearch_node.toml,2020/08/11,['network_traffic'],production,2024/05/21,['Elastic'],"Identifies Elasticsearch nodes that do not have Transport Layer Security (TLS), and/or lack authentication, and are
+accepting inbound network connections over the default Elasticsearch port.
+","['    If you have front-facing proxies that provide authentication and TLS, this rule would need to be tuned to eliminate\n    the source IP address of your reverse-proxy.\n    ']",now-9m,"['packetbeat-*', 'logs-network_traffic.*']",lucene,Elastic License v2,Inbound Connection to an Unsecure Elasticsearch Node,"['https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-security.html', 'https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-http-options.html#_send_all_headers']",47,31295df3-277b-4c56-a1fb-84e31b4222a9,medium,"['Use Case: Threat Detection', 'Tactic: Initial Access', 'Domain: Endpoint']",,,event.ingested,query,"(event.dataset: network_traffic.http OR (event.category: network_traffic AND network.protocol: http)) AND
+    status:OK AND destination.port:9200 AND network.direction:inbound AND NOT http.response.headers.content-type:""image/x-icon"" AND NOT
+    _exists_:http.request.headers.authorization
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1190', 'name': 'Exploit Public-Facing Application', 'reference': 'https://attack.mitre.org/techniques/T1190/'}], 'tactic': {'id': 'TA0001', 'name': 'Initial Access', 'reference': 'https://attack.mitre.org/tactics/TA0001/'}}]"
+rules/network,lateral_movement_dns_server_overflow.toml,2020/07/16,['network_traffic'],production,2024/05/21,['Elastic'],"Specially crafted DNS requests can manipulate a known overflow vulnerability in some Windows DNS servers, resulting in
+Remote Code Execution (RCE) or a Denial of Service (DoS) from crashing the service.
+","['    Environments that leverage DNS responses over 60k bytes will result in false positives - if this traffic is\n    predictable and expected, it should be filtered out. Additionally, this detection rule could be triggered by an\n    authorized vulnerability scan or compromise assessment.\n    ']",,"['packetbeat-*', 'filebeat-*', 'logs-network_traffic.*']",kuery,Elastic License v2,Abnormally Large DNS Response,"['https://research.checkpoint.com/2020/resolving-your-way-into-domain-admin-exploiting-a-17-year-old-bug-in-windows-dns-servers/', 'https://msrc-blog.microsoft.com/2020/07/14/july-2020-security-update-cve-2020-1350-vulnerability-in-windows-domain-name-system-dns-server/', 'https://github.com/maxpl0it/CVE-2020-1350-DoS', 'https://www.elastic.co/security-labs/detection-rules-for-sigred-vulnerability']",47,11013227-0301-4a8c-b150-4db924484475,medium,"['Use Case: Threat Detection', 'Tactic: Lateral Movement', 'Resources: Investigation Guide', 'Use Case: Vulnerability']",,,event.ingested,query,"(event.dataset: network_traffic.dns or (event.category: (network or network_traffic) and destination.port: 53)) and
+  (event.dataset:zeek.dns or type:dns or event.type:connection) and network.bytes > 60000
+","[{'framework': 'MITRE ATT&CK', 'technique': [{'id': 'T1210', 'name': 'Exploitation of Remote Services', 'reference': 'https://attack.mitre.org/techniques/T1210/'}], 'tactic': {'id': 'TA0008', 'name': 'Lateral Movement', 'reference': 'https://attack.mitre.org/tactics/TA0008/'}}]"

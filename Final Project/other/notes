@@ -1,0 +1,11 @@
+# # GitHub detection rule repository Elastic URLs
+# elastic_github_api_url = "https://api.github.com/repos/elastic/detection-rules/contents/rules"
+# elastic_bbr_github_api_url = "https://api.github.com/repos/elastic/detection-rules/contents/rules_building_block"
+
+# # GitHub detection rule repository Splunk URLs
+# splunk_github_api_url = "https://api.github.com/repos/splunk/security_content/contents/detections"
+
+
+SIGMA_EMERGING_GITHUB_API_URL = "https://api.github.com/repos/SigmaHQ/sigma/contents/rules-emerging-threats"
+SIGMA_THREATHUNT_GITHUB_API_URL = "https://api.github.com/repos/SigmaHQ/sigma/contents/rules-threat-hunting"
+SIGMA_UNSUPPORTED_GITHUB_API_URL = "https://api.github.com/repos/SigmaHQ/sigma/contents/unsupported"

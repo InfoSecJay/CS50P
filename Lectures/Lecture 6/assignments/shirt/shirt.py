@@ -1,11 +1,10 @@
 import sys
-from PIL import Image
+from PIL import Image, ImageOps
 
 def main():
     try:
-        print("Hello")
         check_args()
-        input_image = sys.argv[1] 
+        input_image = sys.argv[1]
         output_image = sys.argv[2]
         process_image(input_image, output_image)
     except FileNotFoundError:
@@ -13,15 +12,12 @@ def main():
 
 
 def process_image(input_image, output_image):
-    img = Image.open(input_image)
     shirt = Image.open("shirt.png")
-    print("success")
+    input_image = Image.open(input_image)
     size = shirt.size
-    # img.paste(shirt, shirt)
-    print(img.size)
-    print(shirt.size)
-    
-    # crop the benfore.img 
+    input_image = ImageOps.fit(input_image, size)
+    input_image.paste(shirt, box = (0, 0), mask = shirt)
+    input_image.save(output_image, format=None)
 
 
 def check_args():
@@ -29,11 +25,15 @@ def check_args():
         sys.exit("Too few command-line arguments")
     if len(sys.argv) > 3:
         sys.exit("Too many command-line arguments")
-    if not ((sys.argv[1].endswith(".jpg") or sys.argv[1].endswith(".png") or sys.argv[1].endswith(".jpeg")) and (sys.argv[2].endswith(".jpg") or sys.argv[2].endswith(".png") or sys.argv[2].endswith(".jpeg"))):
+
+    valid_extensions = (".jpg", ".jpeg", ".png")
+    if not (sys.argv[1].endswith(valid_extensions) and sys.argv[2].endswith(valid_extensions)):
         sys.exit("Not an acceptable image file")
-        
-        
-        
-        
+
+    ext1 = sys.argv[1].rsplit('.', 1)[-1].lower()
+    ext2 = sys.argv[2].rsplit('.', 1)[-1].lower()
+    if ext1 != ext2:
+        sys.exit("Files do not have the same extension")
+
 if __name__ == "__main__":
     main()
