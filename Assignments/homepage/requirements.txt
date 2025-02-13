@@ -1,0 +1,26 @@
+HTLM Tags:
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+
+
+CSS Properties:
+1.
+2.
+3.
+4.
+5.
+
+
+JavaScript Explaination:
+
+
+Bootstrap Explaination:
+

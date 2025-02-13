@@ -1,0 +1,18 @@
+sort1 uses: Bubble Sort
+
+How do you know?: Between sort1 and sort2, we know bubble sort performs better when the list is in order and sort1 performs much faster on a sorted list than sort2.
+
+sort2 uses: Merge Sort
+
+How do you know?: Merge sort is the fastest algorithm (O(nlogn)) out of the three and the sum of run times across all files was the lowest for 'sort2'.
+
+sort3 uses: Selection Sort
+
+How do you know?: I identified sort2 to be Merge sort and sort1 to be bubble sort, so by order of elimination.
+
+Appendix - Data:
+file,Sort1,Sort2,Sort3
+reversed10000.txt,0.253,0.071,0.131
+random10000.txt,0.231,0.097,0.173
+sorted10000.txt,0.09,0.105,0.153
+-,0.574,0.273,0.457

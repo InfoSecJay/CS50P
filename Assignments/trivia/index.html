@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+        <script>
+
+            // Load DOM content
+            document.addEventListener('DOMContentLoaded', function() {
+
+                // Check Button: When user clicks on the correct answer button, change the green color
+                let correct = document.querySelector('.correct');
+                correct.addEventListener('click', function(event) {
+                    correct.style.backgroundColor = 'green';
+                    document.querySelector('#feedback1').innerHTML = 'Correct!';
+                });
+
+                // Check Button: When the user clicks on the incorrect answer button, change the red color
+                let incorrects = document.querySelectorAll('.incorrect');
+                for(let i = 0; i < incorrects.length; i++)
+                {
+                    incorrects[i].addEventListener('click', function(event) {
+                        incorrects[i].style.backgroundColor = 'red';
+                        document.querySelector('#feedback1').innerHTML = 'Incorrect';
+                    });
+                }
+
+                // Check free response
+                document.querySelector('#check').addEventListener('click', function(){
+                   let input = document.querySelector('input');
+                   let userAnswer = input.value.trim().toLowerCase();
+
+                   if(userAnswer == 'credential access'){
+                       input.style.backgroundColor = 'green';
+                       document.querySelector('#feedback2').innerHTML = 'Correct!';
+                   } else {
+                       input.style.backgroundColor = 'red';
+                       document.querySelector('#feedback2').innerHTML = 'Incorrect';
+                   }
+                });
+
+            });
+
+        </script>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+
+                <h3>Which is not a MITRE tactic?</h3>
+                <button class="incorrect">Collection</button>
+                <button class="incorrect">Exfiltraion</button>
+                <button class="incorrect">Credential Access</button>
+                <button class="correct">Actions on Objectives</button>
+                <button class="incorrect">Initial Access</button>
+
+                <p id="feedback1"></p>
+            </div>
+
+            <div class="section">
+                <h2>Part 2: Free Response</h2>
+                <hr>
+
+                <h3>Which MITRE ATT&CK tactic is associated with Brute Force technique?</h3>
+
+                <input type="text"></input>
+                <button id="check">Check Answer</button>
+
+                <p id="feedback2"></p>
+
+            </div>
+        </div>
+    </body>
+</html>

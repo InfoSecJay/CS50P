@@ -1,0 +1,20 @@
+Q: If songs.db contains the top 100 songs of one listener from 2018, how would you characterize their audio aura?
+
+The following query is used to get average of each category for the listener :
+sqlite > SELECT AVG(energy), AVG(valence), AVG(danceability), AVG(loudness), AVG(speechiness), AVG(tempo) FROM songs;
++-------------+--------------+-------------------+---------------+------------------+------------+
+| AVG(energy) | AVG(valence) | AVG(danceability) | AVG(loudness) | AVG(speechiness) | AVG(tempo) |
++-------------+--------------+-------------------+---------------+------------------+------------+
+| 0.65906     | 0.484443     | 0.71646           | -5.67764      | 0.115569         | 119.90418  |
++-------------+--------------+-------------------+---------------+------------------+------------+
+
+Based on the query results, we can characterize the users 'audio aura' based on their averages.
+The average energy is 0.65906, the valence is 0.484443, the dancebabiltiy is 0.71646, the loudness is -5.6774, the spechiness is 0.115569 and the tempo is 119.90418.
+These numbers indicate that the top 100 songs have moderate energy, tend to be less positive in valence, and generally danceable with a tempo matching faster electronic dance music tempos.
+
+Q: Hypothesize about why the way you’ve calculated this aura might not be very representative of the listener. What better ways of calculating this aura would you propose?
+
+The aura may not be very representative of the listener due to only including the top 100 songs, excluding the time played of each song, and not accounting for songs added and/or removed over time.
+Additionally, the users musical prefenreces can be further categorized with metadata such as genere (rap, hiphop, edm, etc.) to gather more data points on user aura and correlate with how the user listens to each genre over time.
+Moreoever, the time a song is released can also impact whether or not these songs are timeless to the listener or are something new to the listener that is "in" for the time being and later not listened to as much.
+These issues can be accounted for with weighted aveages
